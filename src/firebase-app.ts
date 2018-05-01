@@ -76,7 +76,7 @@ export class FirebaseAppInternals {
    * @return {Promise<FirebaseAccessToken>} A Promise that will be fulfilled with the current or
    *   new token.
    */
-  public getToken(forceRefresh?: boolean, proxy?: string): Promise<FirebaseAccessToken> {
+  public getToken(forceRefresh?: boolean, agent?: any): Promise<FirebaseAccessToken> {
     const expired = this.cachedToken_ && this.cachedToken_.expirationTime < Date.now();
     if (this.cachedTokenPromise_ && !forceRefresh && !expired) {
       return this.cachedTokenPromise_
@@ -102,7 +102,7 @@ export class FirebaseAppInternals {
 
       // this.credential_ may be an external class; resolving it in a promise helps us
       // protect against exceptions and upgrades the result to a promise in all cases.
-      this.cachedTokenPromise_ = Promise.resolve(this.credential_.getAccessToken(proxy))
+      this.cachedTokenPromise_ = Promise.resolve(this.credential_.getAccessToken(agent))
         .then((result: GoogleOAuthAccessToken) => {
           // Since the developer can provide the credential implementation, we want to weakly verify
           // the return type until the type is properly exported.

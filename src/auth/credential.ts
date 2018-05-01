@@ -242,7 +242,7 @@ export class CertCredential implements Credential {
       Certificate.fromPath(serviceAccountPathOrObject) : new Certificate(serviceAccountPathOrObject);
   }
 
-  public getAccessToken(proxy?: string): Promise<GoogleOAuthAccessToken> {
+  public getAccessToken(agent?: any): Promise<GoogleOAuthAccessToken> {
     const token = this.createAuthJwt_();
     const postData = 'grant_type=urn%3Aietf%3Aparams%3Aoauth%3A' +
       'grant-type%3Ajwt-bearer&assertion=' +
@@ -252,7 +252,7 @@ export class CertCredential implements Credential {
       host: GOOGLE_AUTH_TOKEN_HOST,
       port: GOOGLE_AUTH_TOKEN_PORT,
       path: GOOGLE_AUTH_TOKEN_PATH,
-      proxy,
+      agent,
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
         'Content-Length': postData.length,
@@ -290,7 +290,7 @@ export class CertCredential implements Credential {
  * Interface for things that generate access tokens.
  */
 export interface Credential {
-  getAccessToken(proxy?: string): Promise<GoogleOAuthAccessToken>;
+  getAccessToken(agent?:any): Promise<GoogleOAuthAccessToken>;
   getCertificate(): Certificate;
 }
 
@@ -305,7 +305,7 @@ export class RefreshTokenCredential implements Credential {
       RefreshToken.fromPath(refreshTokenPathOrObject) : new RefreshToken(refreshTokenPathOrObject);
   }
 
-  public getAccessToken(proxy?: string): Promise<GoogleOAuthAccessToken> {
+  public getAccessToken(agent?:any): Promise<GoogleOAuthAccessToken> {
     const postData =
       'client_id=' + this.refreshToken_.clientId + '&' +
       'client_secret=' + this.refreshToken_.clientSecret + '&' +
@@ -317,7 +317,7 @@ export class RefreshTokenCredential implements Credential {
       host: REFRESH_TOKEN_HOST,
       port: REFRESH_TOKEN_PORT,
       path: REFRESH_TOKEN_PATH,
-      proxy,
+      agent,
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
         'Content-Length': postData.length,
@@ -338,12 +338,12 @@ export class RefreshTokenCredential implements Credential {
  * of an App Engine instance or Google Compute Engine machine.
  */
 export class MetadataServiceCredential implements Credential {
-  public getAccessToken(proxy?: string): Promise<GoogleOAuthAccessToken> {
+  public getAccessToken(agent?: any): Promise<GoogleOAuthAccessToken> {
     const options = {
       method: 'GET',
       host: GOOGLE_METADATA_SERVICE_HOST,
       path: GOOGLE_METADATA_SERVICE_PATH,
-      proxy,
+      agent,
       headers: {
         'Content-Length': 0,
       },
@@ -381,8 +381,8 @@ export class ApplicationDefaultCredential implements Credential {
     this.credential_ = new MetadataServiceCredential();
   }
 
-  public getAccessToken(proxy?: string): Promise<GoogleOAuthAccessToken> {
-    return this.credential_.getAccessToken(proxy);
+  public getAccessToken(agent?: any): Promise<GoogleOAuthAccessToken> {
+    return this.credential_.getAccessToken(agent);
   }
 
   public getCertificate(): Certificate {

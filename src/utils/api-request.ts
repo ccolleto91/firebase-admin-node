@@ -17,7 +17,6 @@
 import {deepCopy} from './deep-copy';
 import {FirebaseApp} from '../firebase-app';
 import {AppErrorCodes, FirebaseAppError} from './error';
-const HttpsProxyAgent = require('https-proxy-agent');
 
 import {OutgoingHttpHeaders} from 'http';
 import https = require('https');
@@ -52,10 +51,10 @@ export class HttpRequestHandler {
       data?: object,
       headers?: object,
       timeout?: number,
-      proxy?: string): Promise<object> {
+      agent?: any): Promise<object> {
     // Convenience for calling the real _sendRequest() method with the original params.
     const sendOneRequest = () => {
-      return this._sendRequest(host, port, path, httpMethod, data, headers, timeout, proxy);
+      return this._sendRequest(host, port, path, httpMethod, data, headers, timeout, agent);
     };
 
     return sendOneRequest()
@@ -90,7 +89,7 @@ export class HttpRequestHandler {
       data?: object,
       headers?: object,
       timeout?: number,
-      proxy?: string): Promise<any> {
+      agent?: any): Promise<any> {
     let requestData;
     if (data) {
       try {
@@ -99,8 +98,6 @@ export class HttpRequestHandler {
         return Promise.reject(e);
       }
     }
-
-    const agent = proxy ? new HttpsProxyAgent(proxy) : null;
 
     const options: https.RequestOptions = {
       method: httpMethod,
@@ -234,13 +231,13 @@ export class SignedApiRequestHandler extends HttpRequestHandler {
       data?: object,
       headers?: object,
       timeout?: number,
-      proxy?: string
+      agent?: any
   ): Promise<object> {
-    return this.app_.INTERNAL.getToken(false, proxy).then((accessTokenObj) => {
+    return this.app_.INTERNAL.getToken(false, agent).then((accessTokenObj) => {
       const headersCopy: object = (headers && deepCopy(headers)) || {};
       const authorizationHeaderKey = 'Authorization';
       headersCopy[authorizationHeaderKey] = 'Bearer ' + accessTokenObj.accessToken;
-      return super.sendRequest(host, port, path, httpMethod, data, headersCopy, timeout, proxy);
+      return super.sendRequest(host, port, path, httpMethod, data, headersCopy, timeout, agent);
     });
   }
 }
