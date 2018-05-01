@@ -38,7 +38,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://nexus3.lixar.net/repository/firebase-admin-node"
+    "url": "https://github.com/firebase/firebase-admin-node"
   },
   "main": "lib/index.js",
   "files": [
@@ -74,7 +74,6 @@
     "chai-as-promised": "^6.0.0",
     "chalk": "^1.1.3",
     "del": "^2.2.1",
-    "https-proxy-agent": "^2.2.1",
     "firebase": "~4.6.2",
     "firebase-token-generator": "^2.0.0",
     "gulp": "^3.9.1",
