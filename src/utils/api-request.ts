@@ -17,6 +17,7 @@
 import {deepCopy} from './deep-copy';
 import {FirebaseApp} from '../firebase-app';
 import {AppErrorCodes, FirebaseAppError} from './error';
+const HttpsProxyAgent = require('https-proxy-agent');
 
 import {OutgoingHttpHeaders} from 'http';
 import https = require('https');
@@ -50,10 +51,11 @@ export class HttpRequestHandler {
       httpMethod: HttpMethod,
       data?: object,
       headers?: object,
-      timeout?: number): Promise<object> {
+      timeout?: number,
+      proxy?: string): Promise<object> {
     // Convenience for calling the real _sendRequest() method with the original params.
     const sendOneRequest = () => {
-      return this._sendRequest(host, port, path, httpMethod, data, headers, timeout);
+      return this._sendRequest(host, port, path, httpMethod, data, headers, timeout, proxy);
     };
 
     return sendOneRequest()
@@ -87,7 +89,8 @@ export class HttpRequestHandler {
       httpMethod: HttpMethod,
       data?: object,
       headers?: object,
-      timeout?: number): Promise<any> {
+      timeout?: number,
+      proxy?: string): Promise<any> {
     let requestData;
     if (data) {
       try {
@@ -96,11 +99,15 @@ export class HttpRequestHandler {
         return Promise.reject(e);
       }
     }
+
+    const agent = proxy ? new HttpsProxyAgent(proxy) : null;
+
     const options: https.RequestOptions = {
       method: httpMethod,
       host,
       port,
       path,
+      agent,
       headers: headers as OutgoingHttpHeaders,
     };
     // Only https endpoints.
@@ -226,12 +233,14 @@ export class SignedApiRequestHandler extends HttpRequestHandler {
       httpMethod: HttpMethod,
       data?: object,
       headers?: object,
-      timeout?: number): Promise<object> {
-    return this.app_.INTERNAL.getToken().then((accessTokenObj) => {
+      timeout?: number,
+      proxy?: string
+  ): Promise<object> {
+    return this.app_.INTERNAL.getToken(false, proxy).then((accessTokenObj) => {
       const headersCopy: object = (headers && deepCopy(headers)) || {};
       const authorizationHeaderKey = 'Authorization';
       headersCopy[authorizationHeaderKey] = 'Bearer ' + accessTokenObj.accessToken;
-      return super.sendRequest(host, port, path, httpMethod, data, headersCopy, timeout);
+      return super.sendRequest(host, port, path, httpMethod, data, headersCopy, timeout, proxy);
     });
   }
 }

@@ -84,9 +84,10 @@ export class FirebaseMessagingRequestHandler {
    * @param {string} host The host to which to send the request.
    * @param {string} path The path to which to send the request.
    * @param {object} requestData The request data.
+   * @param {string} proxy Proxy configuration.
    * @return {Promise<object>} A promise that resolves with the response.
    */
-  public invokeRequestHandler(host: string, path: string, requestData: object): Promise<object> {
+  public invokeRequestHandler(host: string, path: string, requestData: object, proxy?: string): Promise<object> {
     return this.signedApiRequestHandler.sendRequest(
       host,
       FIREBASE_MESSAGING_PORT,
@@ -95,6 +96,7 @@ export class FirebaseMessagingRequestHandler {
       requestData,
       FIREBASE_MESSAGING_HEADERS,
       FIREBASE_MESSAGING_TIMEOUT,
+      proxy
     ).then((response) => {
       // Send non-JSON responses to the catch() below where they will be treated as errors.
       if (typeof response === 'string') {

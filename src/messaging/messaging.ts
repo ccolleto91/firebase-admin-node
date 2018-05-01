@@ -726,6 +726,7 @@ export class Messaging implements FirebaseServiceInterface {
     registrationTokenOrTokens: string | string[],
     payload: MessagingPayload,
     options: MessagingOptions = {},
+    proxy?: string
   ): Promise<MessagingDevicesResponse | MessagingDeviceGroupResponse> {
     // Validate the input argument types. Since these are common developer errors when getting
     // started, throw an error instead of returning a rejected promise.
@@ -753,7 +754,7 @@ export class Messaging implements FirebaseServiceInterface {
           request.registration_ids = registrationTokenOrTokens;
         }
 
-        return this.messagingRequestHandler.invokeRequestHandler(FCM_SEND_HOST, FCM_SEND_PATH, request);
+        return this.messagingRequestHandler.invokeRequestHandler(FCM_SEND_HOST, FCM_SEND_PATH, request, proxy);
       })
       .then((response) => {
         // The sendToDevice() and sendToDeviceGroup() methods both set the `to` query parameter in
